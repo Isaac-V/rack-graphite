@@ -1,13 +1,17 @@
 require 'spec_helper'
 
 describe Rack::Graphite do
+  let(:statsd) { double('Mock Statsd::Client') }
+
+  before :each do
+    Statsd.stub(:instance).and_return(statsd)
+  end
+
   context 'with a fake app' do
     let(:app) { double('Mock Rack App') }
-    let(:statsd) { double('Mock Statsd::Client') }
     subject(:middleware) { described_class.new(app) }
 
     before :each do
-      Statsd.stub(:instance).and_return(statsd)
       # Stub out timing by default to and just yield
       statsd.stub(:timing).and_yield
     end
@@ -35,6 +39,31 @@ describe Rack::Graphite do
         statsd.should_receive(:timing)
         middleware.call(nil)
       end
+    end
+  end
+
+  context 'with a simple Sinatra app', :type => :integration do
+    let(:app) do
+      class TestApp < Sinatra::Base
+        use Rack::Graphite
+
+        get '/' do
+          'Hello'
+        end
+      end
+
+      TestApp
+    end
+
+    subject(:response) { last_response }
+
+    context 'with graphites' do
+      before :each do
+        statsd.should_receive(:timing).and_yield
+        get '/'
+      end
+
+      its(:status) { should eql(200) }
     end
   end
 end
