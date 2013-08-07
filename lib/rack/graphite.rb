@@ -1,7 +1,18 @@
-require "rack/graphite/version"
+require 'statsd'
 
 module Rack
-  module Graphite
-    # Your code goes here...
+  class Graphite
+    VERSION = '1.0.0'
+
+    def initialize(app, options={})
+      @app = app
+    end
+
+    def call(env)
+      Statsd.instance.timing('foo') do
+        @app.call(env)
+      end
+    end
+
   end
 end
