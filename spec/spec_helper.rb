@@ -12,6 +12,23 @@ end
 RSpec.configure do |c|
   c.include(Rack::Test::Methods, :type => :integration)
   c.before(:all, :type => :integration) do
-    require 'sinatra/base'
+  end
+end
+
+
+require 'sinatra/base'
+class TestApp < Sinatra::Base
+  use Rack::Graphite
+
+  get '/' do
+    'Hello'
+  end
+
+  get '/onelevel' do
+    'Hello One Level'
+  end
+
+  get '/two/levels' do
+    'Hello Two Levels'
   end
 end

@@ -7,6 +7,28 @@ describe Rack::Graphite do
     Statsd.stub(:instance).and_return(statsd)
   end
 
+
+  describe '#path_to_graphite' do
+    let(:middleware) { described_class.new(nil) }
+    subject(:graphite) { middleware.path_to_graphite(path) }
+
+    context 'with a / URL' do
+      let(:path) { '/' }
+      it { should eql('requests.root') }
+    end
+
+    context 'with a onelevel URL' do
+      let(:path) { '/onelevel' }
+      it { should eql('requests.onelevel') }
+    end
+
+    context 'with a twolevel URL' do
+      let(:path) { '/two/level' }
+      it { should eql('requests.two.level') }
+    end
+  end
+
+
   context 'with a fake app' do
     let(:app) { double('Mock Rack App') }
     subject(:middleware) { described_class.new(app) }
@@ -32,37 +54,34 @@ describe Rack::Graphite do
       it 'should return the result of the propogated app.call' do
         result = double('Mock Rack Response')
         app.should_receive(:call).and_return(result)
-        expect(middleware.call(nil)).to eql(result)
+        expect(middleware.call({})).to eql(result)
       end
 
       it 'should invoke a timer' do
         statsd.should_receive(:timing)
-        middleware.call(nil)
+        middleware.call({})
       end
     end
   end
 
   context 'with a simple Sinatra app', :type => :integration do
-    let(:app) do
-      class TestApp < Sinatra::Base
-        use Rack::Graphite
-
-        get '/' do
-          'Hello'
-        end
-      end
-
-      TestApp
-    end
+    let(:app) { TestApp }
 
     subject(:response) { last_response }
 
-    context 'with graphites' do
+    context 'with a root request' do
       before :each do
-        statsd.should_receive(:timing).and_yield
+        statsd.should_receive(:timing).with('requests.root').and_yield
         get '/'
       end
+      its(:status) { should eql(200) }
+    end
 
+    context 'with a request with query params' do
+      before :each do
+        statsd.should_receive(:timing).with('requests.onelevel').and_yield
+        get '/onelevel?q=foo'
+      end
       its(:status) { should eql(200) }
     end
   end
