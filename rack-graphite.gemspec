@@ -9,6 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["R. Tyler Croy"]
   spec.email         = ["rtyler.croy@lookout.com"]
   spec.description   = "Simple Rack middleware for logging request counts/timing information"
+  spec.summary       = "Simple Rack middleware for logging request counts/timing information"
   spec.homepage      = "https://github.com/lookout/rack-graphite"
   spec.license       = "MIT"
 
