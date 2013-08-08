@@ -26,6 +26,16 @@ describe Rack::Graphite do
       let(:path) { '/two/level' }
       it { should eql('requests.two.level') }
     end
+
+    context 'with an empty URL' do
+      let(:path) { '' }
+      it { should eql('requests.root') }
+    end
+
+    context 'with a nil URL' do
+      let(:path) { nil }
+      it { should eql('requests.root') }
+    end
   end
 
 

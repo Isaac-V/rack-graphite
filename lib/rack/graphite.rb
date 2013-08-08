@@ -22,7 +22,7 @@ module Rack
     end
 
     def path_to_graphite(path)
-      if path == '/'
+      if (path.nil?) || (path == '/') || (path.empty?)
         "#{@prefix}.root"
       else
         path = path.gsub('/', '.')
