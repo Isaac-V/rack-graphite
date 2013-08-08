@@ -12,7 +12,8 @@ module Rack
 
     def call(env)
       path = env['PATH_INFO'] || '/'
-      metric = path_to_graphite(path)
+      method = env['REQUEST_METHOD'] || 'GET'
+      metric = path_to_graphite(method, path)
 
       result = nil
       Statsd.instance.timing(metric) do
@@ -21,12 +22,13 @@ module Rack
       return result
     end
 
-    def path_to_graphite(path)
+    def path_to_graphite(method, path)
+      method = method.downcase
       if (path.nil?) || (path == '/') || (path.empty?)
-        "#{@prefix}.root"
+        "#{@prefix}.#{method}.root"
       else
         path = path.gsub('/', '.')
-        "#{@prefix}#{path}"
+        "#{@prefix}.#{method}#{path}"
       end
     end
   end

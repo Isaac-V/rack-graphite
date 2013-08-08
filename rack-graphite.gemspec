@@ -7,10 +7,9 @@ Gem::Specification.new do |spec|
   spec.name          = "rack-graphite"
   spec.version       = Rack::Graphite::VERSION
   spec.authors       = ["R. Tyler Croy"]
-  spec.email         = ["tyler@monkeypox.org"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.email         = ["rtyler.croy@lookout.com"]
+  spec.description   = "Simple Rack middleware for logging request counts/timing information"
+  spec.homepage      = "https://github.com/lookout/rack-graphite"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)

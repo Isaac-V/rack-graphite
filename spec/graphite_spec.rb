@@ -10,31 +10,35 @@ describe Rack::Graphite do
 
   describe '#path_to_graphite' do
     let(:middleware) { described_class.new(nil) }
-    subject(:graphite) { middleware.path_to_graphite(path) }
+    subject(:graphite) { middleware.path_to_graphite(method, path) }
 
-    context 'with a / URL' do
-      let(:path) { '/' }
-      it { should eql('requests.root') }
-    end
+    context 'GET requests' do
+      let(:method) { 'GET' }
 
-    context 'with a onelevel URL' do
-      let(:path) { '/onelevel' }
-      it { should eql('requests.onelevel') }
-    end
+      context 'with a / URL' do
+        let(:path) { '/' }
+        it { should eql('requests.get.root') }
+      end
 
-    context 'with a twolevel URL' do
-      let(:path) { '/two/level' }
-      it { should eql('requests.two.level') }
-    end
+      context 'with a onelevel URL' do
+        let(:path) { '/onelevel' }
+        it { should eql('requests.get.onelevel') }
+      end
 
-    context 'with an empty URL' do
-      let(:path) { '' }
-      it { should eql('requests.root') }
-    end
+      context 'with a twolevel URL' do
+        let(:path) { '/two/level' }
+        it { should eql('requests.get.two.level') }
+      end
 
-    context 'with a nil URL' do
-      let(:path) { nil }
-      it { should eql('requests.root') }
+      context 'with an empty URL' do
+        let(:path) { '' }
+        it { should eql('requests.get.root') }
+      end
+
+      context 'with a nil URL' do
+        let(:path) { nil }
+        it { should eql('requests.get.root') }
+      end
     end
   end
 
@@ -81,7 +85,7 @@ describe Rack::Graphite do
 
     context 'with a root request' do
       before :each do
-        statsd.should_receive(:timing).with('requests.root').and_yield
+        statsd.should_receive(:timing).with('requests.get.root').and_yield
         get '/'
       end
       its(:status) { should eql(200) }
@@ -89,8 +93,16 @@ describe Rack::Graphite do
 
     context 'with a request with query params' do
       before :each do
-        statsd.should_receive(:timing).with('requests.onelevel').and_yield
+        statsd.should_receive(:timing).with('requests.get.onelevel').and_yield
         get '/onelevel?q=foo'
+      end
+      its(:status) { should eql(200) }
+    end
+
+    context 'with a PUT request' do
+      before :each do
+        statsd.should_receive(:timing).with('requests.put.onelevel').and_yield
+        put '/onelevel'
       end
       its(:status) { should eql(200) }
     end

@@ -24,6 +24,10 @@ class TestApp < Sinatra::Base
     'Hello'
   end
 
+  put '/onelevel' do
+    'Thanks'
+  end
+
   get '/onelevel' do
     'Hello One Level'
   end
