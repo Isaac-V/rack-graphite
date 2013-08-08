@@ -38,3 +38,18 @@ By default this will log metrics such as:
         * `mean`
         * `upper`
         * `upper_90`
+
+## Usage
+
+**In Sinatra**
+
+    require 'rack/graphite'
+
+    class MyApp < Sinatra::Base
+      use Rack::Graphite
+
+      get '/' do
+        'Hello!'
+      end
+    end
+
