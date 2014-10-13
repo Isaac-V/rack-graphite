@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'securerandom'
 
 describe Rack::Graphite do
   let(:statsd) { double('Mock Statsd::Client') }
@@ -10,6 +11,7 @@ describe Rack::Graphite do
 
   describe '#path_to_graphite' do
     let(:middleware) { described_class.new(nil) }
+    let(:guid) { SecureRandom.uuid }
     subject(:graphite) { middleware.path_to_graphite(method, path) }
 
     context 'GET requests' do
@@ -38,6 +40,36 @@ describe Rack::Graphite do
       context 'with a nil URL' do
         let(:path) { nil }
         it { should eql('requests.get.root') }
+      end
+
+      context 'with an id embedded in a path' do
+        let(:path) { '/one/234/five' }
+        it { should eql('requests.get.one.id.five') }
+      end
+
+      context 'with a path ending in an id' do
+        let(:path) { '/one/234' }
+        it { should eql('requests.get.one.id') }
+      end
+
+      context 'with a alpha-numeric in a path' do
+        let(:path) { '/one/v1/two' }
+        it { should eql('requests.get.one.v1.two') }
+      end
+
+      context 'with a guid embedded in a path' do
+        let(:path) { "/one/#{guid}/five" }
+        it { should eql('requests.get.one.guid.five') }
+      end
+
+      context 'with a path ending in a guid' do
+        let(:path) { "/one/#{guid}" }
+        it { should eql('requests.get.one.guid') }
+      end
+
+      context 'with something close to a guid in a path' do
+        let(:path) { '/one/deadbeef-babe-cafe/two' }
+        it { should eql('requests.get.one.deadbeef-babe-cafe.two') }
       end
     end
   end
