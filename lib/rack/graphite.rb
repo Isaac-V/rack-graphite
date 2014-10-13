@@ -2,8 +2,11 @@ require 'statsd'
 
 module Rack
   class Graphite
-    VERSION = '1.0.0'
     PREFIX = 'requests'
+    ID_REGEXP = %r{/\d+(/|$)} # Handle /123/ or /123
+    ID_REPLACEMENT = '/id\1'.freeze
+    GUID_REGEXP = %r{/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(/|$)} # Handle /GUID/ or /GUID
+    GUID_REPLACEMENT = '/guid\1'.freeze
 
     def initialize(app, options={})
       @app = app
@@ -27,7 +30,12 @@ module Rack
       if (path.nil?) || (path == '/') || (path.empty?)
         "#{@prefix}.#{method}.root"
       else
-        path = path.gsub('/', '.')
+        # Replace ' ' => '_', '.' => '-'
+        path = path.tr(' .', '_-')
+        path.gsub!(ID_REGEXP, ID_REPLACEMENT)
+        path.gsub!(GUID_REGEXP, GUID_REPLACEMENT)
+        path.tr!('/', '.')
+
         "#{@prefix}.#{method}#{path}"
       end
     end
