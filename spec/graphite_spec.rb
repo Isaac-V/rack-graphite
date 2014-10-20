@@ -77,11 +77,15 @@ describe Rack::Graphite do
 
   context 'with a fake app' do
     let(:app) { double('Mock Rack App') }
+    let(:status) { 200 }
+    let(:headers) { {:foo => 'bar' } }
+    let(:response) { double('Mock Response') }
     subject(:middleware) { described_class.new(app) }
 
     before :each do
       # Stub out timing by default to and just yield
       statsd.stub(:timing).and_yield
+      statsd.stub(:increment)
     end
 
     describe '#call' do
@@ -89,7 +93,7 @@ describe Rack::Graphite do
 
       before :each do
         # Stub out by default for all tests
-        app.stub(:call)
+        app.stub(:call).and_return([status, headers, response])
       end
 
       it 'should propogate the invocation to the app' do
@@ -97,10 +101,11 @@ describe Rack::Graphite do
         middleware.call(env)
       end
 
+      it 'should return response of the app' do
+      end
+
       it 'should return the result of the propogated app.call' do
-        result = double('Mock Rack Response')
-        app.should_receive(:call).and_return(result)
-        expect(middleware.call({})).to eql(result)
+        expect(middleware.call(env)).to eql([status, headers, response])
       end
 
       it 'should invoke a timer' do
@@ -118,6 +123,7 @@ describe Rack::Graphite do
     context 'with a root request' do
       before :each do
         statsd.should_receive(:timing).with('requests.get.root').and_yield
+        statsd.should_receive(:increment).with('requests.get.root.response.200')
         get '/'
       end
       its(:status) { should eql(200) }
@@ -126,6 +132,7 @@ describe Rack::Graphite do
     context 'with a request with query params' do
       before :each do
         statsd.should_receive(:timing).with('requests.get.onelevel').and_yield
+        statsd.should_receive(:increment).with('requests.get.onelevel.response.200')
         get '/onelevel?q=foo'
       end
       its(:status) { should eql(200) }
@@ -134,6 +141,7 @@ describe Rack::Graphite do
     context 'with a PUT request' do
       before :each do
         statsd.should_receive(:timing).with('requests.put.onelevel').and_yield
+        statsd.should_receive(:increment).with('requests.put.onelevel.response.200')
         put '/onelevel'
       end
       its(:status) { should eql(200) }

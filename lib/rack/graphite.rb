@@ -18,11 +18,12 @@ module Rack
       method = env['REQUEST_METHOD'] || 'GET'
       metric = path_to_graphite(method, path)
 
-      result = nil
+      status, headers, body = nil
       Statsd.instance.timing(metric) do
-        result = @app.call(env)
+        status, headers, body = @app.call(env)
       end
-      return result
+      Statsd.instance.increment("#{metric}.response.#{status}")
+      return status, headers, body
     end
 
     def path_to_graphite(method, path)
