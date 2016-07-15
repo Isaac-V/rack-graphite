@@ -2,10 +2,10 @@ require 'spec_helper'
 require 'securerandom'
 
 describe Rack::Graphite do
-  let(:statsd) { double('Mock Statsd::Client') }
+  let(:statsd) { double('Mock Lookout::StatsdClient') }
 
   before :each do
-    Statsd.stub(:instance).and_return(statsd)
+    Lookout::Statsd.stub(:instance).and_return(statsd)
   end
 
 

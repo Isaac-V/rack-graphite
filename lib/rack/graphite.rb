@@ -1,4 +1,4 @@
-require 'statsd'
+require 'lookout/statsd'
 
 module Rack
   class Graphite
@@ -19,10 +19,10 @@ module Rack
       metric = path_to_graphite(method, path)
 
       status, headers, body = nil
-      Statsd.instance.timing(metric) do
+      Lookout::Statsd.instance.timing(metric) do
         status, headers, body = @app.call(env)
       end
-      Statsd.instance.increment("#{metric}.response.#{status}")
+      Lookout::Statsd.instance.increment("#{metric}.response.#{status}")
       return status, headers, body
     end
 

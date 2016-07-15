@@ -6,7 +6,7 @@ Rack middleware for automatically logging request information to Graphite.
 
 This gem assumes that you're using
 [lookout-statsd](https://github.com/lookout/statsd) and have already initalized
-`Statsd.instance` in your environment before handling any requests.
+`Lookout::Statsd.instance` in your environment before handling any requests.
 
 By default this will log metrics such as:
 
@@ -52,4 +52,3 @@ By default this will log metrics such as:
         'Hello!'
       end
     end
-
