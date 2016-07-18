@@ -83,8 +83,8 @@ describe Rack::Graphite do
     subject(:middleware) { described_class.new(app) }
 
     before :each do
-      # Stub out timing by default to and just yield
-      statsd.stub(:timing).and_yield
+      # Stub out time by default to and just yield
+      statsd.stub(:time).and_yield
       statsd.stub(:increment)
     end
 
@@ -109,7 +109,7 @@ describe Rack::Graphite do
       end
 
       it 'should invoke a timer' do
-        statsd.should_receive(:timing)
+        statsd.should_receive(:time)
         middleware.call({})
       end
     end
@@ -122,7 +122,7 @@ describe Rack::Graphite do
 
     context 'with a root request' do
       before :each do
-        statsd.should_receive(:timing).with('requests.get.root').and_yield
+        statsd.should_receive(:time).with('requests.get.root').and_yield
         statsd.should_receive(:increment).with('requests.get.root.response.200')
         get '/'
       end
@@ -131,7 +131,7 @@ describe Rack::Graphite do
 
     context 'with a request with query params' do
       before :each do
-        statsd.should_receive(:timing).with('requests.get.onelevel').and_yield
+        statsd.should_receive(:time).with('requests.get.onelevel').and_yield
         statsd.should_receive(:increment).with('requests.get.onelevel.response.200')
         get '/onelevel?q=foo'
       end
@@ -140,7 +140,7 @@ describe Rack::Graphite do
 
     context 'with a PUT request' do
       before :each do
-        statsd.should_receive(:timing).with('requests.put.onelevel').and_yield
+        statsd.should_receive(:time).with('requests.put.onelevel').and_yield
         statsd.should_receive(:increment).with('requests.put.onelevel.response.200')
         put '/onelevel'
       end
