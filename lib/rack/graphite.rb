@@ -19,7 +19,7 @@ module Rack
       metric = path_to_graphite(method, path)
 
       status, headers, body = nil
-      Lookout::Statsd.instance.timing(metric) do
+      Lookout::Statsd.instance.time(metric) do
         status, headers, body = @app.call(env)
       end
       Lookout::Statsd.instance.increment("#{metric}.response.#{status}")
