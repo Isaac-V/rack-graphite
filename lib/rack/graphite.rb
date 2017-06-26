@@ -5,8 +5,8 @@ module Rack
     PREFIX = 'requests'
     ID_REGEXP = %r{/\d+(/|$)} # Handle /123/ or /123
     ID_REPLACEMENT = '/id\1'.freeze
-    GUID_REGEXP = %r{/\h{8}-\h{4}-\h{4}-\h{4}-\h{12}(/|$)} # Handle /GUID/ or /GUID
-    GUID_REPLACEMENT = '/guid\1'.freeze
+    GUID_REGEXP = %r{\h{8}-\h{4}-\h{4}-\h{4}-\h{12}(/|$)} # Handle GUID/ or GUID
+    GUID_REPLACEMENT = 'guid\1'.freeze
 
     def initialize(app, options={})
       @app = app
