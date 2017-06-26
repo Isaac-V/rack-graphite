@@ -63,8 +63,8 @@ describe Rack::Graphite do
       end
 
       context 'with a guid embedded in a path without slashes' do
-        let(:path) { "/one_#{guid}/five" }
-        it { should eql('requests.get.one_guid.five') }
+        let(:path) { "/one_#{guid}_one/five" }
+        it { should eql('requests.get.one_guid_one.five') }
       end
 
       context 'with a path ending in a guid' do
