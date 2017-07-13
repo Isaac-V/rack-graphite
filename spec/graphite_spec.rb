@@ -117,6 +117,17 @@ describe Rack::Graphite do
         statsd.should_receive(:time)
         middleware.call({})
       end
+
+      context 'with a filtered request' do
+        let(:middleware) { described_class.new(app, {filters: [ lambda {|req| req['PATH_INFO'].include? 'onelevel'} ]}) }
+        let(:env) { {'PATH_INFO' => '/onelevel'} }
+
+        it 'does not invoke Lookout::Statsd' do
+          statsd.should_not_receive(:time)
+          statsd.should_not_receive(:increment)
+          expect(middleware.call(env)).to eql([status, headers, response])
+        end
+      end
     end
   end
 

@@ -11,9 +11,16 @@ module Rack
     def initialize(app, options={})
       @app = app
       @prefix = options[:prefix] || PREFIX
+      @filters = options[:filters] || []
     end
 
     def call(env)
+      @filters.each do |filter|
+        if filter.call(env)
+          return @app.call(env)
+        end
+      end
+
       path = env['PATH_INFO'] || '/'
       method = env['REQUEST_METHOD'] || 'GET'
       metric = path_to_graphite(method, path)
