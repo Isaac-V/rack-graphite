@@ -52,3 +52,24 @@ By default this will log metrics such as:
         'Hello!'
       end
     end
+    
+Filter options have been added as an initialization parameter allowing 
+specific requests not be processed by [lookout-statsd](https://github.com/lookout/statsd). 
+The filter option is assumed to be a list of lambda functions that will be
+applied to rack requests. An example of initializing rack-graphite with a
+filter option is provided below:
+
+
+    require 'rack/graphite'
+
+    class MyApp < Sinatra::Base
+      use Rack::Graphite, { filters: [ lambda{|env| env['PATH_INFO'].include? 'dont_log'} ] }
+
+      get '/' do
+        'Hello!'
+      end
+      
+      get "/dont_log/#{random_number}" do
+        'Causes too many metrics.'
+      end
+    end
